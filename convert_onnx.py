@@ -22,7 +22,7 @@ net = net.to(device)
 net.eval()
 
 print('Finished loading model!')
-summary(net, (1,32,582))
+summary(net, (1,32,280))
 ##################export###############
 output_onnx = 'ocr-lstm.onnx'
 print("==> Exporting model to ONNX format at '{}'".format(output_onnx))
@@ -37,7 +37,7 @@ output_names=['output']
 dynamic_axes= {'input':{0:'batch_size', 3:'width'}, 'output':{0:'width', 2:'batch_size'}} #adding names for better debugging
 
 torch_out = torch.onnx._export(net, inputs, output_onnx, export_params=True, verbose=False,
-                               input_names=input_names, output_names=output_names)
+                               input_names=input_names, output_names=output_names, dynamic_axes=dynamic_axes)
 
 
 os.system("python -m onnxsim {0} {0}".format(output_onnx))
