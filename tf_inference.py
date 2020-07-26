@@ -39,7 +39,6 @@ def revise_placeholder(width):
             b.size, c.size, h.size, w.size = 1, 1, 32, width
             s.dim.extend([b,c,h,w])
             nn.attr['shape'].shape.CopyFrom(s)
-            print(nn)
         else:
             nn = dynamic_graph.node.add()
             nn.CopyFrom(n)
@@ -49,16 +48,15 @@ def revise_placeholder(width):
 
 
 def tf_predict(image):
-    mask = resizeNormalize(image)
+    mask, w = resizeNormalize(image, dynamic=False)
     
-    x = np.zeros((1, 1, 32, 512), dtype=np.float32)
+    x = np.zeros((1, 1, 32, w), dtype=np.float32)
     x[0] = np.expand_dims(mask, axis=0)
 
-    # dynamic_graph = revise_placeholder(w)
-    # tf.import_graph_def(dynamic_graph, name="")
+    dynamic_graph = revise_placeholder(w)
 
     with tf.Session() as sess:
-        tf.import_graph_def(graph_def, name="")
+        tf.import_graph_def(dynamic_graph, name="")
         input_name = sess.graph.get_tensor_by_name('input:0')
         output = sess.graph.get_tensor_by_name('output:0')
         preds = sess.run(output, {input_name: x})

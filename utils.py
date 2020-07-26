@@ -26,11 +26,14 @@ def resizeNormalize(image, dynamic=False):
         w = 512
         h = int(w / r)
     image = cv2.resize(image, (w,h))
-    mask = np.ones((32, 512), dtype=np.uint8)*255
-    mask[:h, :w] = image
+    if dynamic:
+        mask = image
+    else:
+        mask = np.ones((32, w), dtype=np.uint8)*255
+        mask[:h, :w] = image
     mask = mask / 255.0
 
     mean = 0.5
     std = 0.5
     mask = (mask - mean) / std
-    return mask
+    return mask, w
